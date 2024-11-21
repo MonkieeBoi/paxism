@@ -3,10 +3,12 @@
 #include <ncurses.h>
 #include <stdint.h>
 #include <math.h>
+#include <string.h>
 #include <time.h>
 
 #define RING_L 80
 #define RING_U 176
+#define STR_SZ 32
 
 typedef struct Point {
     int32_t x;
@@ -120,6 +122,10 @@ int chunk_z(Point *blind, double angle) {
     return (int) round((mid_z / 16.0) - 0.5);
 }
 
+void print_mid(char *str, int32_t y_off) {
+    mvprintw(LINES / 2 + y_off, COLS / 2 - (strlen(str) / 2), "%s", str);
+}
+
 int8_t test_axis() {
     clear();
     Point sh = { 0 };
@@ -129,39 +135,53 @@ int8_t test_axis() {
 
     // First measurement
     double fangle = calc_first_angle(&sh, &blind);
-    mvprintw(LINES / 2, COLS / 2 - 7, "1st angle %.1f", fangle);
-    mvprintw(LINES / 2 + 1, COLS / 2 - 4, "line %.2f", angle_to_line(fangle));
+    char fangle_str[STR_SZ] = { 0 };
+    char line_str[STR_SZ] = { 0 };
+    sprintf(fangle_str, "1st angle %.1f", fangle);
+    sprintf(line_str, "line %.2f", angle_to_line(fangle));
+
+    print_mid(fangle_str, 0);
+    print_mid(line_str, 1);
 
     getch();
     clear();
 
     // Second measurement
     double sangle = calc_second_angle(&sh, &blind);
-    mvprintw(LINES / 2, COLS / 2 - 7, "2nd angle %.1f", sangle);
+    char sangle_str[STR_SZ] = { 0 };
+    sprintf(sangle_str, "2nd angle %.1f", sangle);
+
+    print_mid(sangle_str, 0);
 
     getch();
     clear();
 
     // Chunk coords and major/minior
-    mvprintw(LINES / 2, COLS / 2 - 5, "chunk %d %d", chunk_x(&blind, fangle), chunk_z(&blind, fangle));
-    mvprintw(LINES / 2 + 1, COLS / 2 - 3, "major %s",
-             (45 <= fabs(fangle) && fabs(fangle) <= 135) ? "x" : "z");
-    mvprintw(LINES / 2 + 2, COLS / 2 - 1, "%s %s",
-             fangle < 0 ? "+" : "-", fabs(fangle) <= 90 ? "+" : "-");
+    char chunk_str[STR_SZ] = { 0 };
+    char major_str[STR_SZ] = { 0 };
+    char dir_str[STR_SZ] = { 0 };
+    sprintf(chunk_str, "chunk %d %d", chunk_x(&blind, fangle), chunk_z(&blind, fangle));
+    sprintf(major_str, "major %s", (45 <= fabs(fangle) && fabs(fangle) <= 135) ? "x" : "z");
+    sprintf(dir_str, "%s %s", fangle < 0 ? "+" : "-", fabs(fangle) <= 90 ? "+" : "-");
+
+    print_mid(chunk_str, -1);
+    print_mid(major_str, 0);
+    print_mid(dir_str, 1);
 
     getch();
     clear();
 
     // Check
-    mvprintw(LINES / 2 - 4, COLS / 2 - 7, "1st angle %.1f", fangle);
-    mvprintw(LINES / 2 - 3, COLS / 2 - 4, "line %.2f", angle_to_line(fangle));
-    mvprintw(LINES / 2 - 2, COLS / 2 - 7, "2nd angle %.1f", sangle);
-    mvprintw(LINES / 2 - 1, COLS / 2 - 5, "chunk %d %d", chunk_x(&blind, fangle), chunk_z(&blind, fangle));
-    mvprintw(LINES / 2, COLS / 2 - 3, "major %s",
-             (45 <= fabs(fangle) && fabs(fangle) <= 135) ? "x" : "z");
-    mvprintw(LINES / 2 + 1, COLS / 2 - 1, "%s %s",
-             fangle < 0 ? "+" : "-", fabs(fangle) <= 90 ? "+" : "-");
-    mvprintw(LINES / 2 + 3, COLS / 2 - 4, "sh %d %d", (int) round(sh.x / 8.0), (int) round(sh.z / 8.0));
+    char sh_str[STR_SZ] = { 0 };
+    sprintf(sh_str, "sh %d %d", (int) round(sh.x / 8.0), (int) round(sh.z / 8.0));
+    print_mid(fangle_str, -4);
+    print_mid(line_str, -3);
+    print_mid(sangle_str, -2);
+    print_mid(chunk_str, -1);
+    print_mid(major_str, 0);
+    print_mid(dir_str, 1);
+
+    print_mid(sh_str, 2);
 
     char ch = getch();
 
