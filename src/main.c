@@ -143,7 +143,7 @@ int8_t test_axis() {
     print_mid(fangle_str, 0);
     print_mid(line_str, 1);
 
-    getch();
+    while (getch() == KEY_RESIZE);
     clear();
 
     // Second measurement
@@ -153,7 +153,7 @@ int8_t test_axis() {
 
     print_mid(sangle_str, 0);
 
-    getch();
+    while (getch() == KEY_RESIZE);
     clear();
 
     // Chunk coords and major/minior
@@ -168,7 +168,7 @@ int8_t test_axis() {
     print_mid(major_str, 0);
     print_mid(dir_str, 1);
 
-    getch();
+    while (getch() == KEY_RESIZE);
     clear();
 
     // Check
@@ -183,7 +183,8 @@ int8_t test_axis() {
 
     print_mid(sh_str, 2);
 
-    char ch = getch();
+    int ch = getch();
+    while (ch == KEY_RESIZE) ch = getch();
 
     return !(ch == 'q' || ch == 27);
 }
