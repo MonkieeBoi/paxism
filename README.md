@@ -14,3 +14,5 @@ old information is hidden to mimic real runs.
 4. Finally press any key to show all the previous information and the stronghold
    coords in the nether. Since one chunk, no f3+c axis isn't very accurate it is
    expected that the calculated will differ however you should be pretty close
+5. After the check screen you can press esc or q to quit or press any key to
+   restart with a new stronghold
