@@ -126,7 +126,7 @@ void print_mid(char *str, int32_t y_off) {
     mvprintw(LINES / 2 + y_off, COLS / 2 - (strlen(str) / 2), "%s", str);
 }
 
-int8_t test_axis() {
+int8_t test_axis(int precision) {
     clear();
     Point sh = { 0 };
     Point blind = { 0 };
@@ -137,7 +137,7 @@ int8_t test_axis() {
     double fangle = calc_first_angle(&sh, &blind);
     char fangle_str[STR_SZ] = { 0 };
     char line_str[STR_SZ] = { 0 };
-    sprintf(fangle_str, "1st angle %.1f", fangle);
+    sprintf(fangle_str, "1st angle %.*f", precision, fangle);
     sprintf(line_str, "line %.2f", angle_to_line(fangle));
 
     print_mid(fangle_str, 0);
@@ -149,7 +149,7 @@ int8_t test_axis() {
     // Second measurement
     double sangle = calc_second_angle(&sh, &blind);
     char sangle_str[STR_SZ] = { 0 };
-    sprintf(sangle_str, "2nd angle %.1f", sangle);
+    sprintf(sangle_str, "2nd angle %.*f", precision, sangle);
 
     print_mid(sangle_str, 0);
 
@@ -193,8 +193,9 @@ int main(void) {
     setlocale(LC_ALL, "");
     srandom(time(NULL));
     nc_init();
+    int precision = getenv("F3") == NULL ? 1 : 2;
 
-    while (test_axis());
+    while (test_axis(precision));
 
     endwin();
 
