@@ -22,13 +22,27 @@ void nc_init() {
     noecho();
 }
 
-void gen_sh(Point *coords) {
-    int32_t dist = RING_L + random() % (RING_U - RING_L);
-    double angle = (random() % 3599) / 10.0;
-    angle = angle * M_PI / 180;
+int32_t distance(Point *p1, Point *p2) {
+    return sqrt(pow(p1->x - p2->x, 2) + pow(p1->z - p2->z, 2));
+}
 
-    coords->x = (int) (dist * sin(angle)) * 16 + 8;
-    coords->z = (int) (dist * cos(angle)) * 16 + 8;
+void gen_sh(Point *sh, Point *blind) {
+    double angle = (random() % 3599999) / 10000.0 * M_PI / 180;
+    Point tmp = { 0 };
+
+    // Gen 3 strongholds and return closest one
+    for (int i = 0; i < 3; i++) {
+        int32_t dist = RING_L + random() % (RING_U - RING_L);
+        if (angle > 2 * M_PI)
+            angle -= 2 * M_PI;
+        tmp.x = (dist * sin(angle)) * 16 + 8;
+        tmp.z = (dist * cos(angle)) * 16 + 8;
+        if (sh->x == 0 || distance(blind, sh) > distance(blind, &tmp)) {
+            sh->x = tmp.x;
+            sh->z = tmp.z;
+        }
+        angle = (angle + M_PI * 2 / 3);
+    }
 }
 
 void gen_blind(Point *coords) {
@@ -38,10 +52,6 @@ void gen_blind(Point *coords) {
 
     coords->x = (int) (dist * sin(angle)) * 16;
     coords->z = (int) (dist * cos(angle)) * 16;
-}
-
-int32_t distance(Point *p1, Point *p2) {
-    return sqrt(pow(p1->x - p2->x, 2) + pow(p1->z - p2->z, 2));
 }
 
 double angle_to_line(double angle) {
@@ -146,8 +156,8 @@ int8_t test_axis(int precision) {
     clear();
     Point sh = { 0 };
     Point blind = { 0 };
-    gen_sh(&sh);
-    do gen_blind(&blind); while (distance(&sh, &blind) > 3200);
+    gen_blind(&blind);
+    gen_sh(&sh, &blind);
     time_t start_time = get_seconds();
 
     // First measurement
