@@ -126,12 +126,29 @@ void print_mid(char *str, int32_t y_off) {
     mvprintw(LINES / 2 + y_off, COLS / 2 - (strlen(str) / 2), "%s", str);
 }
 
+time_t get_seconds() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    return ts.tv_sec;
+}
+
+void format_time(char *str, int sec) {
+    int min = sec / 60;
+    sec %= 60;
+
+    if (min)
+        sprintf(str, "time %d:%02d", min, sec);
+    else
+        sprintf(str, "time %ds", sec);
+}
+
 int8_t test_axis(int precision) {
     clear();
     Point sh = { 0 };
     Point blind = { 0 };
     gen_sh(&sh);
     do gen_blind(&blind); while (distance(&sh, &blind) > 3200);
+    time_t start_time = get_seconds();
 
     // First measurement
     double fangle = calc_first_angle(&sh, &blind);
@@ -174,6 +191,8 @@ int8_t test_axis(int precision) {
     // Check
     char sh_str[STR_SZ] = { 0 };
     sprintf(sh_str, "sh %d %d", (int) round(sh.x / 8.0), (int) round(sh.z / 8.0));
+    char time_str[STR_SZ] = { 0 };
+    format_time(time_str, get_seconds() - start_time);
     print_mid(fangle_str, -4);
     print_mid(line_str, -3);
     print_mid(sangle_str, -2);
@@ -181,7 +200,8 @@ int8_t test_axis(int precision) {
     print_mid(major_str, 0);
     print_mid(dir_str, 1);
 
-    print_mid(sh_str, 2);
+    print_mid(sh_str, 3);
+    print_mid(time_str, 4);
 
     int ch = getch();
     while (ch == KEY_RESIZE) ch = getch();
