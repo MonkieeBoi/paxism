@@ -71,26 +71,34 @@ double calc_first_angle(Point *sh, Point *blind) {
     return atan2(x_diff, z_diff) * 180 / M_PI;
 }
 
-int calc_x_trav(double angle, double line) {
+double calc_x_trav(double angle, double line) {
     // in mc 0° is pos z and -90° is pos x
     if (45 <= angle && angle <= 135)
         return -16;
     if (-45 >= angle && angle >= -135)
         return 16;
+
+    // align to nearest half block
+    double minor_change = round(line * 4) / 2.0;
+
     if (fabs(angle) >= 0)
-        return round(-line * 2);
-    return round(line * 2);
+        return -minor_change;
+    return minor_change;
 }
 
-int calc_z_trav(double angle, double line) {
+double calc_z_trav(double angle, double line) {
     // in mc 0° is pos z and -90° is pos x
     if (fabs(angle) > 135)
         return -16;
     if (fabs(angle) < 45)
         return 16;
+
+    // align to nearest half block
+    double minor_change = round(line * 4) / 2.0;
+
     if (fabs(angle) > 90)
-        return round(-line * 2);
-    return round(line * 2);
+        return -minor_change;
+    return minor_change;
 }
 
 double calc_second_angle(Point *sh, Point *blind) {
@@ -101,15 +109,12 @@ double calc_second_angle(Point *sh, Point *blind) {
     if (trav_angle > 180)
         trav_angle -= 360;
 
-    int x_trav = calc_x_trav(trav_angle, line);
-    int z_trav = calc_z_trav(trav_angle, line);
+    double x_trav = calc_x_trav(trav_angle, line);
+    double z_trav = calc_z_trav(trav_angle, line);
 
-    Point second = {
-        .x = blind->x + x_trav,
-        .z = blind->z + z_trav
-    };
-
-    return calc_first_angle(sh, &second);
+    double x = -sh->x + blind->x + x_trav;
+    double z = sh->z - blind->z + z_trav;
+    return atan2(x, z) * 180 / M_PI;
 }
 
 int chunk_x(Point *blind, double angle) {
