@@ -172,21 +172,21 @@ int8_t test_axis(int precision) {
     sprintf(fangle_str, "1st angle %.*f", precision, fangle);
     sprintf(line_str, "line %.2f", angle_to_line(fangle));
 
-    print_mid(fangle_str, 0);
-    print_mid(line_str, 1);
-
-    while (getch() == KEY_RESIZE);
-    clear();
+    do {
+        clear();
+        print_mid(fangle_str, 0);
+        print_mid(line_str, 1);
+    } while (getch() == KEY_RESIZE);
 
     // Second measurement
     double sangle = calc_second_angle(&sh, &blind);
     char sangle_str[STR_SZ] = { 0 };
     sprintf(sangle_str, "2nd angle %.*f", precision, sangle);
 
-    print_mid(sangle_str, 0);
-
-    while (getch() == KEY_RESIZE);
-    clear();
+    do {
+        clear();
+        print_mid(sangle_str, 0);
+    } while (getch() == KEY_RESIZE);
 
     // Chunk coords and major/minior
     char chunk_str[STR_SZ] = { 0 };
@@ -196,30 +196,34 @@ int8_t test_axis(int precision) {
     sprintf(major_str, "major %s", (45 <= fabs(fangle) && fabs(fangle) <= 135) ? "x" : "z");
     sprintf(dir_str, "%s %s", fangle < 0 ? "+" : "-", fabs(fangle) <= 90 ? "+" : "-");
 
-    print_mid(chunk_str, -1);
-    print_mid(major_str, 0);
-    print_mid(dir_str, 1);
-
-    while (getch() == KEY_RESIZE);
-    clear();
+    do {
+        clear();
+        print_mid(chunk_str, -1);
+        print_mid(major_str, 0);
+        print_mid(dir_str, 1);
+    } while (getch() == KEY_RESIZE);
 
     // Check
     char sh_str[STR_SZ] = { 0 };
     sprintf(sh_str, "sh %d %d", (int) round(sh.x / 8.0), (int) round(sh.z / 8.0));
     char time_str[STR_SZ] = { 0 };
     format_time(time_str, get_seconds() - start_time);
-    print_mid(fangle_str, -4);
-    print_mid(line_str, -3);
-    print_mid(sangle_str, -2);
-    print_mid(chunk_str, -1);
-    print_mid(major_str, 0);
-    print_mid(dir_str, 1);
 
-    print_mid(sh_str, 3);
-    print_mid(time_str, 4);
+    int ch = 0;
+    do {
+        clear();
+        print_mid(fangle_str, -4);
+        print_mid(line_str, -3);
+        print_mid(sangle_str, -2);
+        print_mid(chunk_str, -1);
+        print_mid(major_str, 0);
+        print_mid(dir_str, 1);
 
-    int ch = getch();
-    while (ch == KEY_RESIZE) ch = getch();
+        print_mid(sh_str, 3);
+        print_mid(time_str, 4);
+
+        ch = getch();
+    } while (ch == KEY_RESIZE);
 
     return !(ch == 'q' || ch == 27);
 }
