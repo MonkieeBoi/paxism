@@ -81,9 +81,7 @@ double calc_x_trav(double angle, double line) {
     // align to nearest half block
     double minor_change = round(line * 4) / 2.0;
 
-    if (fabs(angle) >= 0)
-        return -minor_change;
-    return minor_change;
+    return angle < 0 ? minor_change : -minor_change;
 }
 
 double calc_z_trav(double angle, double line) {
@@ -112,8 +110,9 @@ double calc_second_angle(Point *sh, Point *blind) {
     double x_trav = calc_x_trav(trav_angle, line);
     double z_trav = calc_z_trav(trav_angle, line);
 
-    double x = -sh->x + blind->x + x_trav;
-    double z = sh->z - blind->z + z_trav;
+    double x = -sh->x + (blind->x + x_trav);
+    double z = sh->z - (blind->z + z_trav);
+
     return atan2(x, z) * 180 / M_PI;
 }
 
