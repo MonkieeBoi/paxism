@@ -27,12 +27,12 @@ int32_t distance(Point *p1, Point *p2) {
 }
 
 void gen_sh(Point *sh, Point *blind) {
-    double angle = (random() % 3599999) / 10000.0 * M_PI / 180;
+    double angle = (rand() % 3599999) / 10000.0 * M_PI / 180;
     Point tmp = { 0 };
 
     // Gen 3 strongholds and return closest one
     for (int i = 0; i < 3; i++) {
-        int32_t dist = RING_L + random() % (RING_U - RING_L);
+        int32_t dist = RING_L + rand() % (RING_U - RING_L);
         if (angle > 2 * M_PI)
             angle -= 2 * M_PI;
         tmp.x = (dist * sin(angle)) * 16 + 8;
@@ -46,9 +46,8 @@ void gen_sh(Point *sh, Point *blind) {
 }
 
 void gen_blind(Point *coords) {
-    int32_t dist = random() % RING_U;
-    double angle = (random() % 3599) / 100.0;
-    angle = angle * M_PI / 180;
+    int32_t dist = rand() % RING_U;
+    double angle = (rand() % 3599999) / 10000.0 * M_PI / 180;
 
     coords->x = (int) (dist * sin(angle)) * 16;
     coords->z = (int) (dist * cos(angle)) * 16;
