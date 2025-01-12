@@ -10,6 +10,8 @@
 #define RING_U 176
 #define STR_SZ 32
 
+int travel;
+
 typedef struct Point {
     int32_t x;
     int32_t z;
@@ -73,12 +75,12 @@ double calc_first_angle(Point *sh, Point *blind) {
 double calc_x_trav(double angle, double line) {
     // in mc 0° is pos z and -90° is pos x
     if (45 <= angle && angle <= 135)
-        return -16;
+        return -travel;
     if (-45 >= angle && angle >= -135)
-        return 16;
+        return travel;
 
-    // align to nearest half block
-    double minor_change = round(line * 4) / 2.0;
+    // align to nearest half block in one chunk
+    double minor_change = round(line * (travel / 4.0)) / 2.0;
 
     return angle < 0 ? minor_change : -minor_change;
 }
@@ -86,20 +88,19 @@ double calc_x_trav(double angle, double line) {
 double calc_z_trav(double angle, double line) {
     // in mc 0° is pos z and -90° is pos x
     if (fabs(angle) > 135)
-        return -16;
+        return -travel;
     if (fabs(angle) < 45)
-        return 16;
+        return travel;
 
     // align to nearest half block
-    double minor_change = round(line * 4) / 2.0;
+    double minor_change = round(line * (travel / 4.0)) / 2.0;
 
     if (fabs(angle) > 90)
         return -minor_change;
     return minor_change;
 }
 
-double calc_second_angle(Point *sh, Point *blind) {
-    double fangle = calc_first_angle(sh, blind);
+double calc_second_angle(double fangle, Point *sh, Point *blind) {
     double line = angle_to_line(fangle);
 
     double trav_angle = fangle + 90;
@@ -120,7 +121,7 @@ int chunk_x(Point *blind, double angle) {
     if (trav_angle > 180)
         trav_angle -= 360;
 
-    int mid_x = blind->x + (trav_angle > 0 ? -8 : 8);
+    int mid_x = blind->x + (trav_angle > 0 ? -(travel/2) : (travel/2));
 
     return (int) round((mid_x / 16.0) - 0.5);
 }
@@ -130,7 +131,7 @@ int chunk_z(Point *blind, double angle) {
     if (trav_angle > 180)
         trav_angle -= 360;
 
-    int mid_z = blind->z + (fabs(trav_angle) > 90 ? -8 : 8);
+    int mid_z = blind->z + (fabs(trav_angle) > 90 ? -(travel/2) : (travel/2));
 
     return (int) round((mid_z / 16.0) - 0.5);
 }
@@ -177,7 +178,7 @@ int8_t test_axis(int precision) {
     } while (getch() == KEY_RESIZE);
 
     // Second measurement
-    double sangle = calc_second_angle(&sh, &blind);
+    double sangle = calc_second_angle(fangle, &sh, &blind);
     char sangle_str[STR_SZ] = { 0 };
     sprintf(sangle_str, "2nd angle %.*f", precision, sangle);
 
@@ -231,6 +232,7 @@ int main(void) {
     srandom(time(NULL));
     nc_init();
     int precision = getenv("F3") == NULL ? 1 : 2;
+    travel = getenv("sheetless") == NULL ? 16 : 28;
 
     while (test_axis(precision));
 
