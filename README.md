@@ -16,3 +16,5 @@ old information is hidden to mimic real runs.
    expected that the calculated will differ however you should be pretty close
 5. After the check screen you can press esc or q to quit or press any key to
    restart with a new stronghold
+
+You can set the environment variables F3 and sheetless to switch to 2 dp of precision like with F3+C and to travel 28 blocks instead of 16 to do sheetless instead.
