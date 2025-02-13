@@ -18,7 +18,7 @@ old information is hidden to mimic real runs.
    restart with a new stronghold
 
 You can set the environment variables F3 and sheetless to switch to 2 dp of
-precision like with F3+C and to travel 28 blocks instead of 16 to do sheetless
+precision like with F3+C and to travel 28 blocks instead of 16 to do [sheetless](https://www.youtube.com/watch?v=OKJxB9ClPbo)
 instead.
 
 ## Example
